@@ -54,7 +54,6 @@ start_time, hour, day, week, month, year, weekday
 
 #### Top 10  Active users
 ```sql
-%%sql
 Select b.user_id, u.first_name ||  u.last_name as name_Surname, b.activity
 FROM (SELECT user_id, count(user_id) as activity  
         FROM songplays 
