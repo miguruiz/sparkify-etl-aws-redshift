@@ -59,33 +59,33 @@ staging_songs_table_create = (""" CREATE TABLE songs_staging (
 """)
 
 
-# CREATE FINAL TABLES
+# CREATE FINAL TABLES sortkey distkey
 
 songplay_table_create = (""" CREATE TABLE songplays (
     songplay_id INT IDENTITY(0,1),
-    start_time TIMESTAMP,
-    user_id INT,
-    level TEXT,
+    start_time TIMESTAMP NOT NULL sortkey,
+    user_id INT distkey,
+    level TEXT NOT NULL,
     song_id TEXT,
     artist_id TEXT,
-    session_id INT,
+    session_id INT NOT NULL,
     location TEXT,
     user_agent TEXT
 )
 """)
 
 user_table_create = (""" CREATE TABLE users(
-    user_id INT,
+    user_id INT UNIQUE NOT NULL sortkey,
     first_name TEXT,
     last_name TEXT,
     gender VARCHAR(1),
-    level TEXT
+    level TEXT NOT NULL
     )
 """)
 
 song_table_create = ("""CREATE TABLE songs (
-    song_id TEXT,
-    title TEXT,
+    song_id TEXT UNIQUE NOT NULL sortkey,
+    title TEXT NOT NULL,
     artist_id TEXT,
     year INT,
     duration INT
@@ -93,8 +93,8 @@ song_table_create = ("""CREATE TABLE songs (
 """)
 
 artist_table_create = (""" CREATE TABLE artists (
-    artist_id TEXT,
-    name TEXT,
+    artist_id TEXT UNIQUE NOT NULL sortkey,
+    name TEXT NOT NULL,
     location TEXT,
     lattitude TEXT,
     longitude TEXT
@@ -102,7 +102,7 @@ artist_table_create = (""" CREATE TABLE artists (
 """)
 
 time_table_create = (""" CREATE TABLE time (
-    start_time TIMESTAMP,
+    start_time TIMESTAMP UNIQUE NOT NULL sortkey,
     hour INT,
     day INT,
     week INT,
@@ -152,23 +152,65 @@ AND e.length = s.duration
 """)
 
 
+# Using window function to ensure userId, songs_id, and artists_id are unique 
 
 user_table_insert = ("""
-INSERT INTO users
-(SELECT DISTINCT userid, firstName, lastName, gender, level FROM events_staging)
+INSERT INTO users (
+    SELECT  userid, 
+            firstName, 
+            lastName, 
+            gender, 
+            level
+    FROM (
+        SELECT DISTINCT
+            userid, 
+            firstName, 
+            lastName, 
+            gender, 
+            level,
+            rank() OVER (PARTITION BY userid ORDER BY ts,firstName,lastName,gender,level DESC) AS rank  
+        FROM events_staging) 
+    WHERE rank = 1 and userid is not null
+    )
 """)
-
     
 song_table_insert = ("""
 INSERT INTO songs
-(SELECT DISTINCT song_id, title, artist_id, year, duration FROM songs_staging);
+( SELECT  song_id, 
+            title, 
+            artist_id, 
+            year, 
+            duration
+    FROM (
+        SELECT DISTINCT
+            song_id, 
+            title, 
+            artist_id, 
+            year, 
+            duration,
+            rank() OVER (PARTITION BY song_id ORDER BY year,duration,title,duration  DESC) AS rank       
+        FROM songs_staging) 
+    WHERE rank = 1 and song_id is not null);
 """)
 
 artist_table_insert = ("""
-INSERT INTO artists
-(SELECT DISTINCT artist_id, artist_name, artist_location, artist_latitude FROM songs_staging );
-""")
-
+INSERT INTO artists(
+    SELECT  artist_id, 
+            artist_name, 
+            artist_location, 
+            artist_latitude, 
+            artist_longitude
+    FROM (
+        SELECT DISTINCT
+            artist_id, 
+            artist_name, 
+            artist_location, 
+            artist_latitude, 
+            artist_longitude,
+            rank() OVER (PARTITION BY artist_id ORDER BY year,artist_location,artist_name,artist_latitude,artist_longitude  DESC) AS rank       
+        FROM songs_staging) 
+    WHERE rank = 1
+)""")
 
 time_table_insert = ("""
 INSERT INTO time 

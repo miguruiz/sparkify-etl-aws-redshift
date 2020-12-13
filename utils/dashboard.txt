@@ -1,2 +1,0 @@
-https://towardsdatascience.com/how-to-build-a-complex-reporting-dashboard-using-dash-and-plotl-4f4257c18a7f
-http://alanpryorjr.com/2017-09-24-stockstreamer/
