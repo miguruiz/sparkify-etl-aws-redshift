@@ -38,17 +38,10 @@ songplay_id, start_time, user_id, level, song_id, artist_id, session_id, locatio
 
 #### Dimension Tables
 
-**USERS** - users in the app
-user_id, first_name, last_name, gender, level
-
-**SONGS**  - songs in music database
-song_id, title, artist_id, year, duration
-
-**ARTISTS** - artists in music database
-artist_id, name, location, latitude, longitude
-
-**TIME** - timestamps of records in songplays broken down into specific units
-start_time, hour, day, week, month, year, weekday
+- **USERS** - users in the app - user_id, first_name, last_name, gender, level
+- **SONGS**  - songs in music database - song_id, title, artist_id, year, duration
+- **ARTISTS** - artists in music database - artist_id, name, location, latitude, longitude
+- **TIME** - timestamps of records in songplays broken down into specific units - start_time, hour, day, week, month, year, weekday
 
 ### Sample queries
 
