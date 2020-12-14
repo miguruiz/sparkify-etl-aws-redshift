@@ -4,18 +4,27 @@ from sql_queries import copy_table_queries, insert_table_queries
 
 
 def load_staging_tables(cur, conn):
+    """
+    Creates staging tables. Copies data from s3 into redshift without any transformation.
+    """
     for query in copy_table_queries:
         cur.execute(query)
         conn.commit()
 
 
 def insert_tables(cur, conn):
+    """
+    Transforms and inserts data from the staging tables into the final ones.
+    """
     for query in insert_table_queries:
         cur.execute(query)
         conn.commit()
 
 
 def main():
+    """
+    Connects to the enviroment specified in the conf file, and executesload_staging_tables and insert_tables
+    """
     config = configparser.ConfigParser()
     config.read('dwh.cfg')
     

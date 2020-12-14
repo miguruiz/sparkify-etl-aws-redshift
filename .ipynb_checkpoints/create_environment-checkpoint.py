@@ -8,7 +8,11 @@ import os
 import json
 
 def main():
-    # Create Environment
+"""
+Given a configuration file, and a credentials one creates the redshift enviroment required
+to execute the etl.
+"""
+    # Read credentials
     config = configparser.ConfigParser()
     try:
         config.read_file(open('credentials.cfg'))
@@ -26,7 +30,7 @@ def main():
         pass
     copyfile("dwh_original.cfg", "dwh.cfg")
 
-    # Create Environment
+    # Read Configuration parameters
     config = configparser.ConfigParser()
     config.read_file(open('dwh.cfg'))
 

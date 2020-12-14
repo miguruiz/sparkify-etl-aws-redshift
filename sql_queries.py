@@ -1,6 +1,8 @@
 import configparser
 
-
+"""
+The following script contains the SQL queries executed by create_table.py and etl.py
+"""
 # CONFIG
 config = configparser.ConfigParser()
 config.read('dwh.cfg')

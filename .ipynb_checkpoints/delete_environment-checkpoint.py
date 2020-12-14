@@ -7,8 +7,13 @@ from shutil import copyfile
 import os
 import json
 
+
+
 def main():
-    # Create Environment
+    """
+    Delets the enviroment created from create_enviroment.py
+    """
+    # Read AWS Credentials
     config = configparser.ConfigParser()
     try:
         config.read_file(open('credentials.cfg'))
@@ -19,7 +24,7 @@ def main():
         print("Remember to create 'credentials.cfg' with [CREDENTIALS] KEY & SECRET")
         exit()
 
-    # Create Environment
+    # Read Conf parameters
     config = configparser.ConfigParser()
     config.read_file(open('dwh.cfg'))
 
@@ -40,12 +45,11 @@ def main():
                            aws_access_key_id=KEY,
                            aws_secret_access_key=SECRET
                            )
-
+    # Delete Environment
     redshift.delete_cluster( ClusterIdentifier=HOST,  SkipFinalClusterSnapshot=True)
     iam.detach_role_policy(RoleName=IAM_ROLE_NAME, PolicyArn="arn:aws:iam::aws:policy/AmazonS3ReadOnlyAccess")
     iam.delete_role(RoleName=IAM_ROLE_NAME)
 
-    # Remove Environment
     try:
         os.remove("dwh.cfg")
     except:
